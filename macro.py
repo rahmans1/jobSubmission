@@ -132,7 +132,7 @@ for i in runrange:
   jsubf.write("#SBATCH --cpus-per-task=5\n")
   jsubf.write("#SBATCH --mem=5G\n")
   jsubf.write("#SBATCH --output="+tmp+"/"+generator+"_"+ str(i)+ ".out\n")
-  jsubf.write("source /home/rahmans/bin/cedar_env.csh \n")
+  jsubf.write("source /home/rahmans/bin/cedar_env.sh \n")
   jsubf.write("cd "+home+"/build\n")
   jsubf.write("echo \"Current working directory is `pwd`\"\n")
   jsubf.write("./remoll "+macro+"/"+generator+"_"+ str(i)+ ".mac\n")
