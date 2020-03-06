@@ -33,24 +33,14 @@ if not sys.argv[7]:
 else:
         tmp= sys.argv[7]
 if not sys.argv[8]:
-	batch= "1mm"
+	batch= "101_hybrid_kryp"
 else:
 	batch= sys.argv[8]
 if not sys.argv[9]:
 	generator="moller"
 else:
 	generator=sys.argv[9]
-if not sys.argv[10]:
-	rasteroffset="0"
-else:
-	rasteroffset=sys.argv[10]
 
-
-rastercorr=0.149*2.5*1e-3
-beam_theta= math.atan(float(rasteroffset) / (2.5/math.tan(rastercorr)))
-rastercorr=180/math.pi*rastercorr
-beam_theta= 180/math.pi*beam_theta
-print(str(rastercorr) +" and " + str(beam_theta))
 
 
 if generator=="beam":
@@ -58,13 +48,13 @@ if generator=="beam":
 else:
   detector = [28]
 
-runrange= range(1,201)
+runrange= range(1,1001)
 
 
 if generator=="beam" or generator=="elastic" or generator=="inelastic":
-  eventsperfile = 10000
+  eventsperfile = 1000
 else:
-  eventsperfile = 5000
+  eventsperfile = 1000
 
 jsub=jsub+"/"+generator
 macro=macro+"/"+generator
@@ -102,26 +92,20 @@ for i in runrange:
   macrof.write("/remoll/physlist/register QGSP_BERT_HP\n")
   macrof.write("/remoll/physlist/parallel/enable\n") 
   macrof.write("/remoll/parallel/setfile "+geometry+"/mollerParallel.gdml\n")
-  macrof.write("/run/numberOfThreads 10\n")
+  macrof.write("/run/numberOfThreads 5\n")
   macrof.write("/run/initialize\n")
-  # macrof.write("/remoll/addfield "+field+"/default/text/blockyHybrid_rm_3.0.txt\n")
-  # macrof.write("/remoll/addfield "+field+"/default/text/blockyUpstream_rm_1.1.txt\n")
   macrof.write("/remoll/addfield "+field+"/hybridJLAB.txt\n")
   macrof.write("/remoll/addfield "+field+"/upstreamJLAB_1.25.txt\n")	
   macrof.write("/remoll/evgen/set "+generator+"\n")
   if generator=="beam":
-    macrof.write("/remoll/evgen/beam/origin 0 0 -7.5 m\n")
+    macrof.write("/remoll/evgen/beam/origin 0 0 -19.81 m\n")
     macrof.write("/remoll/evgen/beam/rasx 5 mm\n")
     macrof.write("/remoll/evgen/beam/rasy 5 mm\n")
-    macrof.write("/remoll/evgen/beam/corrx 0.149\n")
-    macrof.write("/remoll/evgen/beam/corry 0.149\n")
+    macrof.write("/remoll/evgen/beam/corrx 0.065\n")
+    macrof.write("/remoll/evgen/beam/corry 0.065\n")
     macrof.write("/remoll/evgen/beam/rasrefz -4.5 m\n")
   else:
     macrof.write("/remoll/oldras false\n")
-    macrof.write("/remoll/beam_corrph {0:0.5f}\n".format(rastercorr))
-    macrof.write("/remoll/beam_corrth {0:0.5f}\n".format(rastercorr))
-    macrof.write("/remoll/beam_y0 "+str(rasteroffset)+"\n") 
-    macrof.write("/remoll/beam_th0 {0:0.5f}\n".format(beam_theta))
   macrof.write("/remoll/beamene 11 GeV\n")
   macrof.write("/remoll/beamcurr 85 microampere\n")
   macrof.write("/remoll/SD/disable_all\n")
@@ -141,17 +125,13 @@ for i in runrange:
 		
   jsubf=open(jsub+"/"+generator+"_"+ str(i)+ ".sh", "w")
   jsubf.write("#!/bin/bash\n")
- # jsubf.write("#SBATCH --account=rahmans\n")
   jsubf.write("#SBATCH --job-name=remoll\n")
-  jsubf.write("#SBATCH --time=01:15:00\n")
+  jsubf.write("#SBATCH --time=00:25:00\n")
   jsubf.write("#SBATCH --nodes=1\n")
   jsubf.write("#SBATCH --ntasks=1\n")
   jsubf.write("#SBATCH --cpus-per-task=5\n")
   jsubf.write("#SBATCH --mem=5G\n")
   jsubf.write("#SBATCH --output="+tmp+"/"+generator+"_"+ str(i)+ ".out\n")
-# jsubf.write("cd "+home+"/build\n")
-# jsubf.write("echo \"Current working directory is `pwd`\"\n")
-  #jsubf.write("tcsh -c \"source /site/12gev_phys/softenv.csh 2.3\"\n")
   jsubf.write("source /home/rahmans/bin/cedar_env.csh \n")
   jsubf.write("cd "+home+"/build\n")
   jsubf.write("echo \"Current working directory is `pwd`\"\n")
