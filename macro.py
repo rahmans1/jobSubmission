@@ -51,8 +51,8 @@ else:
 runrange= range(1,1001)
 
 
-if generator=="beam" or generator=="elastic" or generator=="inelastic":
-  eventsperfile = 1000
+if generator=="beam":
+  eventsperfile = 5000
 else:
   eventsperfile = 1000
 
