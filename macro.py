@@ -33,7 +33,7 @@ if not sys.argv[7]:
 else:
         tmp= sys.argv[7]
 if not sys.argv[8]:
-	batch= "101_hybrid_kryp"
+	batch= "101_hybrid_kryp_b2"
 else:
 	batch= sys.argv[8]
 if not sys.argv[9]:
