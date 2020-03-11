@@ -127,7 +127,7 @@ for i in runrange:
   jsubf.write("#!/bin/bash\n")
   jsubf.write("#SBATCH --account=def-jmammei\n")
   jsubf.write("#SBATCH --job-name=remoll\n")
-  jsubf.write("#SBATCH --time=00:20:00\n")
+  jsubf.write("#SBATCH --time=00:25:00\n")
   jsubf.write("#SBATCH --nodes=1\n")
   jsubf.write("#SBATCH --ntasks=1\n")
   jsubf.write("#SBATCH --cpus-per-task=5\n")
