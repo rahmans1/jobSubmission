@@ -33,11 +33,11 @@ if not sys.argv[7]:
 else:
         tmp= sys.argv[7]
 if not sys.argv[8]:
-	batch= "101_hybrid_kryp_b2"
+	batch= "101_hybrid_real"
 else:
 	batch= sys.argv[8]
 if not sys.argv[9]:
-	generator="moller"
+	generator="beam"
 else:
 	generator=sys.argv[9]
 
@@ -51,8 +51,8 @@ else:
 runrange= range(1,1001)
 
 
-if generator=="beam" or generator=="elastic" or generator=="inelastic":
-  eventsperfile = 1000
+if generator=="beam":
+  eventsperfile = 5000
 else:
   eventsperfile = 1000
 
@@ -98,7 +98,7 @@ for i in runrange:
   macrof.write("/remoll/addfield "+field+"/upstreamJLAB_1.25.txt\n")	
   macrof.write("/remoll/evgen/set "+generator+"\n")
   if generator=="beam":
-    macrof.write("/remoll/evgen/beam/origin 0 0 -19.81 m\n")
+    macrof.write("/remoll/evgen/beam/origin 0 0 -7.5 m\n")
     macrof.write("/remoll/evgen/beam/rasx 5 mm\n")
     macrof.write("/remoll/evgen/beam/rasy 5 mm\n")
     macrof.write("/remoll/evgen/beam/corrx 0.065\n")
@@ -125,6 +125,7 @@ for i in runrange:
 		
   jsubf=open(jsub+"/"+generator+"_"+ str(i)+ ".sh", "w")
   jsubf.write("#!/bin/bash\n")
+  jsubf.write("#SBATCH --partition=compute\n")
   jsubf.write("#SBATCH --job-name=remoll\n")
   jsubf.write("#SBATCH --time=00:25:00\n")
   jsubf.write("#SBATCH --nodes=1\n")
