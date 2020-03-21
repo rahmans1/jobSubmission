@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import os
 import subprocess
@@ -5,15 +7,15 @@ import math
 import time
 import argparse
 
-parser = argparse.ArgumentParser(description="Submit array jobs to GREX")
+parser = argparse.ArgumentParser(description="Submit array jobs to GREX.")
 parser.add_argument("-s", dest="src", action="store", required=False, default="/home/jmammei/REMOLL/remoll_version", help="source folder where simulation directory exists")
 parser.add_argument("-v", dest="version", action="store", required=False, default="real_shield", help= "choose the version of simulation to use. current options are develop, kryp_shield, and real_shield")
 parser.add_argument("-j", dest="jsub_dir", action="store", required=True, help="choose directory to write the slurm submission scripts")
 parser.add_argument("-t", dest="tmp_dir", action="store", required=True, help="choose directory to write the slurm output logs")
 parser.add_argument("-o", dest="out_dir", action="store", required=True, help="choose where to write the output root files")
-parser.add_argument("-g", dest="gen", action= "store", required=False, default="moller",  help="choose generator to use")
-parser.add_argument("-d", dest="det_list", action= "store", required=False, default=[28], help="provide list of sensitive detectors. Example: [28, 29]")
-parser.add_argument("-r", dest="run_range", action = "store", required=False, default="1-3", help="provide run range. Example: \"2-5\"")
+parser.add_argument("-g", dest="gen", action= "store", required=False, default="moller",  help="choose generator to use. Options are moller, elastic, inelastic, beam, etc.")
+parser.add_argument("-d", dest="det_list", action= "store", required=False, default=[28], help="provide list of sensitive detectors. Example: [28, 29]. By default, all detectors detect low energy neutrals and secondaries. All detectors with detector id<33 are boundary hit detectors")
+parser.add_argument("-r", dest="run_range", action = "store", required=False, default="1", help="provide run range. Example: \"2-5\"")
 parser.add_argument("-n", dest="n_events", action= "store", required=False, default=1000, help= "provide number of events per job in the array")
 parser.add_argument("--time", dest="time", action= "store", required= False, default= "00:25:00", help= "provide the estimated run time. Ex: \"00:25:00\". Usually it is 10 minutes for 1000 moller events.")
 
@@ -27,6 +29,7 @@ if not os.path.exists(args.tmp_dir):
 if not os.path.exists(args.out_dir):
         os.system("mkdir -p "+args.out_dir)
 
+out=os.path.realpath(args.out_dir)
 		
 jsubf=open(args.jsub_dir+"/"+args.gen+".sh", "w")
 jsubf.write("#!/bin/bash\n")
@@ -37,8 +40,8 @@ jsubf.write("#SBATCH --nodes=1\n")
 jsubf.write("#SBATCH --ntasks=1\n")
 jsubf.write("#SBATCH --cpus-per-task=5\n")
 jsubf.write("#SBATCH --mem=5G\n")
-jsubf.write("#SBATCH --output="+args.tmp_dir+"/"+args.gen+"_%a.out\n")
-jsubf.write("source /home/rahmans/bin/cedar_env.sh \n")
+jsubf.write("#SBATCH --output="+args.tmp_dir+"/"+args.gen+"_%A_%a.out\n")
+jsubf.write("source /home/jmammei/REMOLL/environment/cedar_env.sh \n")
 
 macro="$TMPDIR/"+args.gen+"_${SLURM_JOBID}_${SLURM_ARRAY_TASK_ID}.mac"
 jsubf.write("touch "+macro+"\n")
@@ -73,7 +76,7 @@ jsubf.write("echo /remoll/kryptonite/volume logicUSTracker >>"+macro+"\n")
 jsubf.write("echo /remoll/kryptonite/volume logicDSTracker >>"+macro+"\n")
 jsubf.write("echo /remoll/kryptonite/volume logicWasher_12 >>"+macro+"\n")
 jsubf.write("echo /remoll/kryptonite/enable >>"+macro+"\n")
-jsubf.write("echo /remoll/filename "+args.out_dir+"/"+args.gen+"_${SLURM_ARRAY_TASK_ID}.root >>"+macro+"\n")
+jsubf.write("echo /remoll/filename "+out+"/"+args.gen+"_${SLURM_JOBID}_${SLURM_ARRAY_TASK_ID}.root >>"+macro+"\n")
 jsubf.write("echo /run/beamOn "+str(args.n_events)+" >>"+macro+"\n")  
 jsubf.write("cat "+macro+"\n")
 
